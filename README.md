@@ -193,6 +193,63 @@ Keep background colors, text labels, and arrow graphics exactly as-is.
 
 ---
 
+
+---
+
+## Face Swap with Gemini (Recommended)
+
+The `gemini_faceswap.py` script passes your **actual reference photo** alongside the source thumbnail to Google Gemini's image model in a single multimodal call. This produces accurate face swaps because the model sees your real face — not a text description of it.
+
+> **Why this beats text-to-image:** Describing a face in words generates a generic face. Showing Gemini a reference photo locks it to *your* actual features, hair style, and facial structure.
+
+### Quick start
+
+```bash
+# 1. Add your Gemini key to .env
+GOOGLE_GEMINI_API_KEY=your_key_here
+
+# 2. Swap your face into a single thumbnail
+python gemini_faceswap.py \
+  --source thumbnails/channel/video.jpg \
+  --reference my_photo.jpg
+
+# 3. Control pose, zoom, or expression
+python gemini_faceswap.py \
+  --source thumbnails/channel/video.jpg \
+  --reference my_photo.jpg \
+  --prompt "person facing camera, smiling warmly, zoomed in waist-up"
+
+# 4. Batch — process a full channel folder
+python gemini_faceswap.py \
+  --folder thumbnails/mrBeast/ \
+  --reference my_photo.jpg \
+  --limit 5
+```
+
+### How it works
+
+1. Loads your reference photo and the source thumbnail
+2. Sends both images to Gemini with structured rules:
+   - Keep layout, text, background, and color grade pixel-identical
+   - Replace only the face and hair with yours from the reference
+   - Match head angle, wardrobe, and lighting from the original
+3. Returns a 16:9 PNG with your face inserted
+
+### Tips for best results
+
+- Use a **clear, well-lit reference photo** facing the camera directly
+- Source thumbnails with a **clearly visible, forward-facing person** work best
+- Use `--prompt` to adjust pose/zoom/expression without changing identity
+- If face drift occurs, add more specifics to `--identity` (hair color, beard, etc.)
+- Download source thumbnails via `scrape_channel_thumbnails.py` — YouTube CDN thumbnails are clean, no player overlays or timestamps
+
+### Cost
+
+| Step | Cost |
+|------|------|
+| Gemini face-swap per image | ~$0.15–0.25 |
+| 10 face-swapped thumbnails | ~$1.50–2.50 |
+
 ## Requirements
 
 - Python 3.10+
